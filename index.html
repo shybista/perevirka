@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Детектив Факт — гра для юних слідчих</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;800&family=Nunito:wght@500;700&display=swap&subset=cyrillic">
+<style>
+:root{--bg:#e9f1fa;--card:#fff;--ink:#16253a;--soft:#4b5d75;--line:#c9d7e8;--fact:#0f9d76;--fact-bg:#d8f5ec;--fake:#e0402f;--fake-bg:#fde3df;--sun:#ffc933;--sunink:#3a2a00;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a28;--card:#182739;--ink:#eaf1f8;--soft:#a8b9cd;--line:#2c4058;--fact:#3fd0a3;--fact-bg:#12362f;--fake:#ff7a6b;--fake-bg:#3d1e1d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1a28;--card:#182739;--ink:#eaf1f8;--soft:#a8b9cd;--line:#2c4058;--fact:#3fd0a3;--fact-bg:#12362f;--fake:#ff7a6b;--fake-bg:#3d1e1d;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 1.0625rem/1.5 Nunito,"Segoe UI",system-ui,sans-serif;min-height:100vh}
+main{max-width:620px;margin:0 auto;padding:16px 16px 40px}
+h1,h2,.big{font-family:Rubik,"Trebuchet MS",system-ui,sans-serif;font-weight:800;line-height:1.15;margin:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.lens{width:30px;height:30px;border-radius:50%;border:5px solid var(--sun);position:relative;flex:none}
+.lens::after{content:"";position:absolute;width:5px;height:14px;background:var(--sun);right:-6px;bottom:-12px;transform:rotate(-40deg);border-radius:3px}
+.score{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:700;white-space:nowrap}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;width:0;background:var(--sun);transition:width .4s}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:22px 20px;position:relative;overflow:hidden}
+.case{color:var(--soft);font-weight:700;margin-bottom:10px}
+.q{font-family:Rubik,system-ui,sans-serif;font-weight:500;font-size:clamp(1.3rem,5.2vw,1.65rem);line-height:1.3;min-height:6.2em;margin:0 0 20px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:16px;min-height:60px;padding:12px 16px;transition:transform .1s}
+button:active{transform:scale(.96)}
+button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.ans{font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:1.3rem;color:#fff}
+.ans.fact{background:#0f9d76}.ans.fake{background:#d93b2b}
+.ans:disabled{cursor:default;opacity:.45}
+.ans.picked{opacity:1;outline:4px solid var(--ink);outline-offset:2px}
+.stamp{position:absolute;right:14px;top:14px;font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:2rem;border:5px solid;padding:2px 14px;border-radius:10px;transform:rotate(-9deg);opacity:0;pointer-events:none;background:var(--card)}
+.stamp.show{animation:slam .35s cubic-bezier(.2,1.6,.4,1) forwards}
+.stamp.fact{color:var(--fact)}.stamp.fake{color:var(--fake)}
+@keyframes slam{from{opacity:0;transform:rotate(-9deg) scale(2.6)}to{opacity:1;transform:rotate(-9deg) scale(1)}}
+.fb{margin-top:18px;border-radius:16px;padding:14px 16px;display:none}
+.fb.ok{background:var(--fact-bg);display:block}.fb.no{background:var(--fake-bg);display:block}
+.fb b{font-family:Rubik,system-ui,sans-serif;font-size:1.15rem;display:block;margin-bottom:4px}
+.next{display:none;width:100%;margin-top:14px;background:var(--sun);color:var(--sunink);font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:1.15rem}
+.next.show{display:block}
+.start{text-align:center}
+.start .big{font-size:clamp(2rem,9vw,2.7rem);margin:6px 0 12px}
+.start p{margin:0 0 18px;color:var(--soft)}
+.rules{display:grid;gap:10px;text-align:left;margin:0 0 22px;padding:0;list-style:none}
+.rules li{background:var(--bg);border-radius:14px;padding:10px 14px}
+.cta{background:var(--sun);color:var(--sunink);font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:1.25rem;width:100%}
+.end h2{font-size:1.9rem;margin:4px 0 6px;text-align:center}
+.pts{text-align:center;font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:3.2rem;margin:6px 0}
+.rank{text-align:center;color:var(--soft);margin-bottom:16px}
+.tips{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:10px}
+.tips li{border-left:6px solid var(--sun);padding:4px 0 4px 12px}
+.tips b{font-family:Rubik,system-ui,sans-serif}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.stamp.show{animation:none;opacity:1}.bar i{transition:none}}
+@media (max-width:380px){.btns{gap:8px}.ans{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+  <div class="brand"><span class="lens" aria-hidden="true"></span>Детектив Факт</div>
+  <div class="score" id="score" hidden>⭐ 0</div>
+</div>
+
+<section class="card start" id="start">
+  <div class="big">Факт чи фейк?</div>
+  <p>Ти — юний детектив. Прочитай твердження та вирішуй: це правда чи вигадка?</p>
+  <ul class="rules">
+    <li>🔎 Тебе чекає 12 справ.</li>
+    <li>👆 Натисни «Факт» або «Фейк».</li>
+    <li>💡 Після кожної відповіді дізнаєшся, як це перевірити.</li>
+  </ul>
+  <button class="cta" id="go">Почати розслідування</button>
+</section>
+
+<section hidden id="game">
+  <div class="bar" role="progressbar" aria-label="Прогрес" id="barwrap"><i id="bar"></i></div>
+  <div class="card">
+    <div class="stamp" id="stamp" aria-hidden="true"></div>
+    <div class="case" id="case"></div>
+    <p class="q" id="q"></p>
+    <div class="btns">
+      <button class="ans fact" id="bf">✅ Факт</button>
+      <button class="ans fake" id="bk">❌ Фейк</button>
+    </div>
+    <div class="fb" id="fb" role="status" aria-live="polite"></div>
+    <button class="next" id="next">Наступна справа</button>
+  </div>
+</section>
+
+<section hidden class="card end" id="end">
+  <h2>Розслідування завершено!</h2>
+  <div class="pts" id="pts"></div>
+  <div class="rank" id="rank"></div>
+  <ul class="tips">
+    <li><b>Хто це сказав?</b> Шукай автора й надійне джерело.</li>
+    <li><b>Скільки джерел?</b> Знайди цю новину ще на 2–3 перевірених сайтах.</li>
+    <li><b>Не поспішай ділитися.</b> Фейки люблять, коли їх пересилають.</li>
+    <li><b>Не вір тільки картинці.</b> Фото можна змінити або створити за допомогою ШІ.</li>
+  </ul>
+  <button class="cta" id="again">Зіграти ще раз</button>
+</section>
+</main>
+
+<script>
+var POOL=[
+["Мед, який зберігається правильно, може не псуватися сотні й навіть тисячі років.",1,"У меді мало води, а ще він містить речовини, що не дають бактеріям розмножуватися."],
+["Люди використовують лише 10 % свого мозку.",0,"Сканери показують: працює весь мозок, просто різні його частини — у різний час."],
+["Блискавка ніколи не влучає двічі в те саме місце.",0,"Влучає! Високі будівлі, наприклад хмарочоси, блискавка «обирає» багато разів на рік."],
+["Восьминіг має три серця.",1,"Два серця качають кров до зябер, а третє — до решти тіла."],
+["Страуси ховають голову в пісок, коли бояться.",0,"Страус у небезпеці тікає або притискається до землі. Голова в піску — просто вигадка."],
+["Великий Китайський мур видно з Місяця неозброєним оком.",0,"Мур довгий, але дуже вузький. З Місяця його не розгледіти."],
+["Верблюди зберігають воду у своїх горбах.",0,"У горбах верблюда — жир. Він слугує запасом енергії."],
+["Говерла — найвища гора України.",1,"Її висота — приблизно 2061 метр. Вона розташована в Карпатах."],
+["Золота рибка пам’ятає лише три секунди.",0,"Досліди показали, що рибки запам’ятовують, де їх годують, і пам’ятають це місяцями."],
+["На рівні моря вода закипає при 100 °C.",1,"У горах повітря розрідженіше, тому вода закипає при нижчій температурі."],
+["Кажани сліпі.",0,"Кажани бачать. А в темряві їм ще допомагає особливий «звуковий зір» — ехолокація."],
+["Сонце — це зірка.",1,"Це найближча до нас зірка. Інші зірки здаються маленькими, бо вони дуже далеко."],
+["Пінгвіни живуть на Північному полюсі.",0,"Пінгвіни живуть у Південній півкулі, найбільше — в Антарктиці. На півночі їх немає."],
+["Повідомлення: «Перешли 10 друзям — і отримаєш 1000 грн на гру!» — це правда.",0,"Це обман. Не переходь за такими посиланнями, нічого не пересилай і розкажи дорослим."],
+["Якщо новину переслали тисячі людей, вона точно правдива.",0,"Фейки поширюються так само швидко, як і правда. Важливо, хто автор і де є докази."],
+["Реалістичне фото гарантує, що ця подія справді була.",0,"Фото можна змінити в редакторі або створити за допомогою ШІ. Шукай те саме фото в надійних джерелах."],
+["Щоб перевірити новину, корисно знайти її ще на двох-трьох надійних сайтах.",1,"Якщо про подію пишуть різні перевірені джерела, шанс на правду значно більший."]
+];
+var N=12,list,i,score,locked;
+var $=function(id){return document.getElementById(id)};
+function shuffle(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),t=a[k];a[k]=a[j];a[j]=t}return a}
+function show(id){["start","game","end"].forEach(function(s){$(s).hidden=s!==id});$("score").hidden=id==="start"}
+function begin(){list=shuffle(POOL).slice(0,N);i=0;score=0;show("game");load()}
+function load(){
+  locked=false;var it=list[i];
+  $("case").textContent="Справа "+(i+1)+" з "+N;
+  $("q").textContent=it[0];
+  $("bar").style.width=(i/N*100)+"%";
+  $("barwrap").setAttribute("aria-valuenow",Math.round(i/N*100));
+  $("score").textContent="⭐ "+score;
+  var st=$("stamp");st.className="stamp";st.textContent="";
+  var fb=$("fb");fb.className="fb";fb.innerHTML="";
+  $("next").className="next";$("next").textContent=i===N-1?"Дізнатись результат":"Наступна справа";
+  [$("bf"),$("bk")].forEach(function(b){b.disabled=false;b.classList.remove("picked")});
+}
+function answer(isFact){
+  if(locked)return;locked=true;
+  var it=list[i],right=(isFact===!!it[1]);
+  if(right)score++;
+  $("score").textContent="⭐ "+score;
+  var st=$("stamp");st.textContent=it[1]?"ФАКТ":"ФЕЙК";st.className="stamp "+(it[1]?"fact":"fake")+" show";
+  var pick=isFact?$("bf"):$("bk");
+  $("bf").disabled=true;$("bk").disabled=true;pick.classList.add("picked");
+  var fb=$("fb");fb.className="fb "+(right?"ok":"no");
+  fb.innerHTML="";
+  var h=document.createElement("b");h.textContent=right?"🎉 Вірно! Гарна робота, детективе.":"🤔 Цього разу не вгадав(-ла).";
+  var p=document.createElement("span");p.textContent=it[2];
+  fb.appendChild(h);fb.appendChild(p);
+  $("next").className="next show";$("next").focus({preventScroll:false});
+}
+function finish(){
+  $("bar").style.width="100%";show("end");
+  $("pts").textContent=score+" / "+N;
+  var r=score>=11?"🏆 Головний детектив! Фейки від тебе не сховаються."
+       :score>=8?"🕵️ Детектив! Ти добре розрізняєш факти та фейки."
+       :score>=5?"🔎 Помічник детектива. Ще трохи практики — і ти майстер!"
+       :"🌱 Стажер. Спробуй ще раз — кожна справа вчить уважності!";
+  $("rank").textContent=r;
+  window.scrollTo(0,0);
+}
+$("go").onclick=begin;$("again").onclick=begin;
+$("bf").onclick=function(){answer(true)};
+$("bk").onclick=function(){answer(false)};
+$("next").onclick=function(){i++;if(i>=N){finish()}else{load();window.scrollTo(0,0)}};
+</script>
+</body>
+</html>
