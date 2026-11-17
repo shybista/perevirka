@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Детектив Факт — гра для юних слідчих</title>
@@ -49,6 +48,12 @@ button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
 .rules{display:grid;gap:10px;text-align:left;margin:0 0 22px;padding:0;list-style:none}
 .rules li{background:var(--bg);border-radius:14px;padding:10px 14px}
 .cta{background:var(--sun);color:var(--sunink);font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:1.25rem;width:100%}
+.fields{display:grid;gap:12px;margin:0 0 18px;text-align:left}
+.fields label{font-family:Rubik,system-ui,sans-serif;font-weight:500;display:grid;gap:6px}
+.fields input{font:inherit;width:100%;min-height:52px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.fields input:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+.err{color:var(--fake);font-weight:700;min-height:1.5em;margin:-6px 0 8px}
+.who{text-align:center;font-weight:700;color:var(--soft);margin:0}
 .end h2{font-size:1.9rem;margin:4px 0 6px;text-align:center}
 .pts{text-align:center;font-family:Rubik,system-ui,sans-serif;font-weight:800;font-size:3.2rem;margin:6px 0}
 .rank{text-align:center;color:var(--soft);margin-bottom:16px}
@@ -75,6 +80,11 @@ button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
     <li>👆 Натисни «Факт» або «Фейк».</li>
     <li>💡 Після кожної відповіді дізнаєшся, як це перевірити.</li>
   </ul>
+  <div class="fields">
+    <label>Прізвище<input id="nm" type="text" maxlength="40" autocomplete="off" placeholder="Наприклад, Шевченко"></label>
+    <label>Клас<input id="cl" type="text" maxlength="8" autocomplete="off" placeholder="Наприклад, 5-А"></label>
+  </div>
+  <div class="err" id="err" role="alert"></div>
   <button class="cta" id="go">Почати розслідування</button>
 </section>
 
@@ -95,6 +105,7 @@ button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
 
 <section hidden class="card end" id="end">
   <h2>Розслідування завершено!</h2>
+  <p class="who" id="who"></p>
   <div class="pts" id="pts"></div>
   <div class="rank" id="rank"></div>
   <ul class="tips">
@@ -161,6 +172,7 @@ function answer(isFact){
 }
 function finish(){
   $("bar").style.width="100%";show("end");
+  $("who").textContent=who.n+", клас "+who.c;
   $("pts").textContent=score+" / "+N;
   var r=score>=11?"🏆 Головний детектив! Фейки від тебе не сховаються."
        :score>=8?"🕵️ Детектив! Ти добре розрізняєш факти та фейки."
@@ -169,7 +181,10 @@ function finish(){
   $("rank").textContent=r;
   window.scrollTo(0,0);
 }
-$("go").onclick=begin;$("again").onclick=begin;
+var who={n:"",c:""};
+function tryStart(){var n=$("nm").value.trim(),c=$("cl").value.trim();if(!n||!c){$("err").textContent="Введи прізвище та клас, щоб почати.";(n?$("cl"):$("nm")).focus();return}$("err").textContent="";who.n=n;who.c=c;begin()}
+$("go").onclick=tryStart;$("again").onclick=begin;
+["nm","cl"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter")tryStart()})});
 $("bf").onclick=function(){answer(true)};
 $("bk").onclick=function(){answer(false)};
 $("next").onclick=function(){i++;if(i>=N){finish()}else{load();window.scrollTo(0,0)}};
